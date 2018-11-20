@@ -1,8 +1,9 @@
 from Game import Game, Player
 
-game = Game()
-game.add_player(Player("Austin"))
-game.add_player(Player("Alex"))
-game.add_player(Player("Mom"))
-game.add_player(Player("Dad"))
-game.play()
+for i in range(1000):
+	game = Game(debug=True)
+	game.add_player(Player("Austin", debug=True))
+	game.add_player(Player("Alex", debug=True))
+	game.add_player(Player("Mom", debug=True))
+	game.add_player(Player("Dad", debug=True))
+	game.play()

@@ -57,8 +57,8 @@ class Deck():
 		self.int_deck_array.sort()
 
 		# print the face value and associated number value for each card
-		for i in range(52):
-			print(self.deck_array[i], str(self.int_deck_array[i]))
+		# for i in range(52):
+		# 	print(self.deck_array[i], str(self.int_deck_array[i]))
 
 	def shuffle_deck(self):
 		"""

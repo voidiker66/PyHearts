@@ -6,7 +6,7 @@ class Game():
 		self.players is a list of Player objects
 	"""
 
-	def __init__(self):
+	def __init__(self, debug=False):
 		self.players = list()
 		self.game_over = False
 		self.deck = Deck()
@@ -16,6 +16,8 @@ class Game():
 		self.center = dict()
 		self.round_over = False
 		self.hearts_broken = False
+
+		self.output_debug = debug
 
 		# the card that dictates who starts the round
 		# 39 = 2 of clubs, 40 = 3 of clubs
@@ -40,25 +42,25 @@ class Game():
 
 	def score_round(self):
 		"""
-			current_score the round and adds the points to the respective players
-		"""
-		self.end_of_round_status()
-
-	def end_of_round_status(self):
-		"""
-			checks if there is a loser and outputs the current status of the players
+			score the round and adds the points to the respective players
+			then checks if there is a game_over status
+			if not, start a new round of the game
 		"""
 		winner = None
 		best_score = 200
 		for player in self.players:
+			player.score_pile()
 			if player.score < best_score:
 				winner = player.name
 				best_score = player.score
 			if player.score > 100:
-				print(player.name, " lost the game!")
+				self.debug(player.name + " lost the game!")
 				self.game_over = True
 		if self.game_over:
-			print("The winner of the game is " + winner + " with a score of " + str(best_score) + "!")
+			self.debug("The winner of the game is " + winner + " with a score of " + str(best_score) + "!")
+		else:
+			self.start_round()
+		
 
 	def play(self):
 		"""
@@ -72,10 +74,10 @@ class Game():
 		"""
 			print the scores
 		"""
-		print()
+		self.debug()
 		for player in self.players:
-			print(player.name + " has a score of " + str(player.score))
-		print()
+			self.debug(player.name + " has a score of " + str(player.score))
+		self.debug()
 
 	def start_round(self):
 		"""
@@ -99,15 +101,16 @@ class Game():
 			# if player1 is out of cards, all other players will be out, too
 			if len(self.players[0].hand.deck_array) <= 0:
 				self.round_over = True
+		self.score_round()
 
 	def print_center(self):
 		"""
 			prints the center to allow players to see what cards have been played so far this turn
 		"""
-		print('Cards played in this order: ')
+		self.debug('Cards played in this order: ')
 		for key, value in self.center.items():
-			print(value, end=' ')
-		print('\n')
+			self.debug(value, end=' ')
+		self.debug('\n')
 
 	def players_take_turn(self, first_card=None):
 		"""
@@ -188,6 +191,7 @@ class Game():
 			int_card = self.deck.convert_external_card_to_int(card)
 			suit = int_card // 13
 			if suit == 1 and not self.hearts_broken:
+				self.debug("Hearts have been broken.")
 				self.hearts_broken = True
 			if suit_initial == suit and int_card >= top_card:
 				self.player_start_round = player
@@ -195,3 +199,11 @@ class Game():
 
 		# now that we know who played the highest viable card, we give them the center
 		self.players[self.player_start_round].add_to_pile(list(card for player, card in self.center.items()))
+
+
+	def debug(self, message='', end='\n'):
+		if self.output_debug:
+			print(message, end=end)
+
+
+
