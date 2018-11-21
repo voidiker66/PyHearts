@@ -1,7 +1,7 @@
 from Deck import Deck
 
 # temporary to automate gameplay
-import random
+# import random
 
 class Player():
 
@@ -22,7 +22,6 @@ class Player():
 			player chooses card to play if he has a card
 			should never reach here if hand is empty
 		"""
-		self.debug(self.hand.deck_array)
 		self.debug(self.name + ", it is your turn.")
 		if len(self.hand.deck_array) <= 0:
 			return None
@@ -32,29 +31,29 @@ class Player():
 
 		# temporary to automate gameplay
 		# card_index = len(self.hand.deck_array)
-		r = len(self.hand.deck_array) - 1
+		# r = len(self.hand.deck_array) - 1
 
 		while not self.valid:
 			# print out Player's hand
-			# for i in range(len(self.hand.deck_array)):
-			# 	self.debug(str(i), self.hand.deck_array[i])
+			for i in range(len(self.hand.deck_array)):
+				print(str(i), self.hand.deck_array[i])
 
 			# get index of the card in the Player's hand
 			# user input must be an int associated with the index of the hand
-			# try:
-			# 	card_index = int(input("Which card will you play?\n"))
-			# 	if card_index == '':
-			# 		self.debug("Please type the number next to the card you want to play and press enter.\n")
-			# 		continue
-			# 	if card_index < 0 or card_index >= len(self.hand.deck_array):
-			# 		self.debug("This is not a valid choice.")
-			# 		continue
-			# except ValueError:
-			# 	self.debug("The user input was not a number.")
-			# 	continue
+			try:
+				card_index = int(input("Which card will you play?\n"))
+				if card_index == '':
+					self.debug("Please type the number next to the card you want to play and press enter.\n")
+					continue
+				if card_index < 0 or card_index >= len(self.hand.deck_array):
+					self.debug("This is not a valid choice.")
+					continue
+			except ValueError:
+				self.debug("The user input was not a number.")
+				continue
 
 			# temporary to automate gameplay
-			card_index = random.randint(0, r)
+			# card_index = random.randint(0, r)
 
 			if self.check_play_validity(self.hand.int_deck_array[card_index], initial, first_card, hearts_broken):
 				self.valid = True
