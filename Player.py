@@ -89,7 +89,8 @@ class Player():
 
 		# if the end result of scoring is a score that's a multiple of 50
 		# we subtract 50 from the score, but only if the score increased to 50 this round
-		if self.score % 50 == 0 and score_increase != 0:
+		# and is not zero
+		if self.score % 50 == 0 and score_increase != 0 and self.score != 0:
 			self.score -= 50
 
 	def check_play_validity(self, card, initial, first_card, hearts_broken):
