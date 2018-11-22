@@ -1,7 +1,7 @@
 from Deck import Deck
 
 # temporary to automate gameplay
-# import random
+import random
 
 class Player():
 
@@ -31,29 +31,30 @@ class Player():
 
 		# temporary to automate gameplay
 		# card_index = len(self.hand.deck_array)
-		# r = len(self.hand.deck_array) - 1
+		r = len(self.hand.deck_array) - 1
 
 		while not self.valid:
 			# print out Player's hand
 			for i in range(len(self.hand.deck_array)):
-				print(str(i), self.hand.deck_array[i])
+				self.debug(str(i), self.hand.deck_array[i])
 
 			# get index of the card in the Player's hand
 			# user input must be an int associated with the index of the hand
-			try:
-				card_index = int(input("Which card will you play?\n"))
-				if card_index == '':
-					self.debug("Please type the number next to the card you want to play and press enter.\n")
-					continue
-				if card_index < 0 or card_index >= len(self.hand.deck_array):
-					self.debug("This is not a valid choice.")
-					continue
-			except ValueError:
-				self.debug("The user input was not a number.")
-				continue
+
+			# try:
+			# 	card_index = int(input("Which card will you play?\n"))
+			# 	if card_index == '':
+			# 		self.debug("Please type the number next to the card you want to play and press enter.\n")
+			# 		continue
+			# 	if card_index < 0 or card_index >= len(self.hand.deck_array):
+			# 		self.debug("This is not a valid choice.")
+			# 		continue
+			# except ValueError:
+			# 	self.debug("The user input was not a number.")
+			# 	continue
 
 			# temporary to automate gameplay
-			# card_index = random.randint(0, r)
+			card_index = random.randint(0, r)
 
 			if self.check_play_validity(self.hand.int_deck_array[card_index], initial, first_card, hearts_broken):
 				self.valid = True
@@ -72,7 +73,10 @@ class Player():
 
 	def score_pile(self):
 		score_increase = 0
-		pile = Deck(self.cards_won)
+		if self.cards_won:
+			pile = Deck(self.cards_won)
+		else:
+			pile = Deck(['1♣'])
 		for card in pile.int_deck_array:
 			suit = card // 13
 			# every heart counts as a point, but queen of spades counts as 13
@@ -92,6 +96,8 @@ class Player():
 		# and is not zero
 		if self.score % 50 == 0 and score_increase != 0 and self.score > 0:
 			self.score -= 50
+
+		self.cards_won = list()
 
 	def check_play_validity(self, card, initial, first_card, hearts_broken):
 		"""

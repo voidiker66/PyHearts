@@ -6,7 +6,7 @@ class Game():
 		self.players is a list of Player objects
 	"""
 
-	def __init__(self, debug=False):
+	def __init__(self, tracker=None, debug=False):
 		self.players = list()
 		self.game_over = False
 		self.deck = Deck()
@@ -17,6 +17,7 @@ class Game():
 		self.round_over = False
 		self.hearts_broken = False
 
+		self.tracker = tracker
 		self.output_debug = debug
 
 		# the card that dictates who starts the round
@@ -126,6 +127,8 @@ class Game():
 		# initial card is set by the first Player
 		center_initial = self.players[self.player_start_round].take_turn(None, first_card, self.hearts_broken)
 		self.center[self.player_start_round] = center_initial
+		if self.tracker:
+			self.tracker.card_played(self.deck.convert_external_card_to_int(center_initial))
 
 		# we need the number value for the validation to work
 		int_center_initial = self.deck.convert_external_card_to_int(center_initial)
@@ -133,9 +136,13 @@ class Game():
 		for i in range(self.player_start_round + 1, len(self.players)):
 			self.print_center()
 			self.center[i] = self.players[i].take_turn(int_center_initial, None, self.hearts_broken)
+			if self.tracker:
+				self.tracker.card_played(self.deck.convert_external_card_to_int(self.center[i]))
 		for i in range(self.player_start_round):
 			self.print_center()
 			self.center[i] = self.players[i].take_turn(int_center_initial, None, self.hearts_broken)
+			if self.tracker:
+				self.tracker.card_played(self.deck.convert_external_card_to_int(self.center[i]))
 
 		# end the turn and select a new player to start the next turn
 		self.end_turn(int_center_initial)
@@ -196,6 +203,9 @@ class Game():
 			if suit_initial == suit and int_card >= top_card:
 				self.player_start_round = player
 				top_card = int_card
+
+		if self.tracker:
+			self.tracker.end_turn()
 
 		# now that we know who played the highest viable card, we give them the center
 		self.players[self.player_start_round].add_to_pile(list(card for player, card in self.center.items()))
