@@ -8,6 +8,10 @@ class SmartPlayer(Player):
 		in order to create a ranking system with ELO
 	"""
 
-	def take_turn(self, initial, first_card=None, hearts_broken):
-		
-		pass
+	def take_turn(self, initial, first_card=None, hearts_broken=False):
+		print(self.tracker)
+		return super(SmartPlayer, self).take_turn(initial, first_card, hearts_broken)
+
+
+	def add_tracker(self, tracker):
+		self.tracker = tracker

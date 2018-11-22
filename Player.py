@@ -30,13 +30,13 @@ class Player():
 		self.valid = False
 
 		# temporary to automate gameplay
-		# card_index = len(self.hand.deck_array)
-		r = len(self.hand.deck_array) - 1
+		card_index = -1
+		# r = len(self.hand.deck_array) - 1
 
 		while not self.valid:
 			# print out Player's hand
 			for i in range(len(self.hand.deck_array)):
-				self.debug(str(i), self.hand.deck_array[i])
+				self.debug(str(i) + ' ' + self.hand.deck_array[i])
 
 			# get index of the card in the Player's hand
 			# user input must be an int associated with the index of the hand
@@ -54,7 +54,8 @@ class Player():
 			# 	continue
 
 			# temporary to automate gameplay
-			card_index = random.randint(0, r)
+			# card_index = random.randint(0, r)
+			card_index += 1
 
 			if self.check_play_validity(self.hand.int_deck_array[card_index], initial, first_card, hearts_broken):
 				self.valid = True
@@ -104,6 +105,7 @@ class Player():
 			check if this card is possible to be played considering
 			the player's hand and the initial card played
 		"""
+
 		# if initial has not been set (this is the first card to be played), all cards are viable
 		if not initial:
 			# if card is the first in the round, must be 2 of clubs
