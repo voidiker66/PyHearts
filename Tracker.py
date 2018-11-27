@@ -1,13 +1,29 @@
 class Tracker():
 
 	def __init__(self):
+
+		# all variables are set in refresh
 		self.refresh()
 
+		# we can also track how many rounds are in a game
+		# we start at 0 because game starts rounds until game is finished
+		# so best way to track is increment on start_round
+		self.round_number = 0
+
+		# track who received the queen each round
+		self.queens = list()
+
 	def refresh(self):
+		"""
+			resets all the variables so that next round is fresh
+		"""
+		self.turn_number = 1
+
 		self.cards_played = list()
 		self.cards_left = 52
 		self.hearts_broken = False
 		self.current_center = list()
+		self.current_player = None
 
 		# suits counts so we can reduce times calculated
 		# allows us to know how many of each suit are left
@@ -18,12 +34,17 @@ class Tracker():
 		# dict of lists, where player_id provides list of suits player no longer has
 		self.off_suit = dict()
 
+		# we need to keep track of how many points each player has received
+		self.points_received = dict()
+
 	def card_played(self, card, player_id):
 		"""
 			tracks the card played and which player played it
 			player is the player id from the game, not the player object
 			if player plays off-suit card, we know he does not have that suit
 		"""
+		self.current_player = player_id
+
 		self.current_center.append(card)
 		self.cards_played.append(card)
 		self.cards_left -= 1
@@ -53,4 +74,36 @@ class Tracker():
 			self.hearts_broken = True
 
 	def end_turn(self):
+		"""
+			at the end of a turn, the center is cleared
+		"""
 		self.current_center = list()
+		self.turn_number += 1
+
+	def start_round(self):
+		"""
+			at the end of a round, we increment the round counter
+		"""
+		self.round_number += 1
+
+	def set_players(self, player_count):
+		"""
+			sets the number of players in the game
+			this is for SmartPlayer to determine how many players
+			are left to play after their card
+		"""
+		self.player_count = player_count
+
+	def track_cards_received(self, cards, player_id):
+		"""
+			for each card received, add the value to the player if heart or queen of spades
+		"""
+		# if card is queen of spades
+		for card in cards:
+			if card == 10:
+				# add the player_id to the list of who received the queen of spades
+				self.queens.append(player_id)
+				self.points_received[player_id] += 13
+			# if card is a heart
+			elif card // 13 == 1:
+				self.points_received[player_id] += 1

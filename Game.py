@@ -67,6 +67,9 @@ class Game():
 		"""
 			starts the game
 		"""
+		# if tracker, set how many players are in the game
+		if self.tracker:
+			self.tracker.set_players(len(self.players))
 		# if 3 player game, we set aside the last card when dealing
 		self.first_heart = len(self.players) == 3
 		self.start_round()
@@ -84,9 +87,10 @@ class Game():
 		"""
 			starts the new round and continues until all cards are played
 		"""
-		# if tracker exists, refresh
+		# if tracker exists, refresh and increment the round counter
 		if self.tracker:
 			self.tracker.refresh()
+			self.tracker.start_round()
 
 		# reset round_over
 		self.round_over = False
@@ -209,6 +213,9 @@ class Game():
 				top_card = int_card
 
 		if self.tracker:
+			# track points for the turn
+			self.tracker.track_cards_received(list(card for player, card in self.center.items()))
+			# refresh the center and increment the turn counter
 			self.tracker.end_turn()
 
 		# now that we know who played the highest viable card, we give them the center
