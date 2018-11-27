@@ -157,3 +157,9 @@ class Player():
 		"""
 		for card in cards_won:
 			self.cards_won.append(card)
+
+	def get_valid_cards(self, initial, first_card, hearts_broken):
+		"""
+			returns a list of the int values of all the cards in the hand that are valid to be played
+		"""
+		return list([c for c in self.hand.int_deck_array if self.check_play_validity(c, initial, first_card, hearts_broken)])
