@@ -84,6 +84,10 @@ class Game():
 		"""
 			starts the new round and continues until all cards are played
 		"""
+		# if tracker exists, refresh
+		if self.tracker:
+			self.tracker.refresh()
+
 		# reset round_over
 		self.round_over = False
 		# resets hearts broken
@@ -128,7 +132,7 @@ class Game():
 		center_initial = self.players[self.player_start_round].take_turn(None, first_card, self.hearts_broken)
 		self.center[self.player_start_round] = center_initial
 		if self.tracker:
-			self.tracker.card_played(self.deck.convert_external_card_to_int(center_initial))
+			self.tracker.card_played(self.deck.convert_external_card_to_int(center_initial), self.player_start_round)
 
 		# we need the number value for the validation to work
 		int_center_initial = self.deck.convert_external_card_to_int(center_initial)
@@ -137,12 +141,12 @@ class Game():
 			self.print_center()
 			self.center[i] = self.players[i].take_turn(int_center_initial, None, self.hearts_broken)
 			if self.tracker:
-				self.tracker.card_played(self.deck.convert_external_card_to_int(self.center[i]))
+				self.tracker.card_played(self.deck.convert_external_card_to_int(self.center[i]), i)
 		for i in range(self.player_start_round):
 			self.print_center()
 			self.center[i] = self.players[i].take_turn(int_center_initial, None, self.hearts_broken)
 			if self.tracker:
-				self.tracker.card_played(self.deck.convert_external_card_to_int(self.center[i]))
+				self.tracker.card_played(self.deck.convert_external_card_to_int(self.center[i]), i)
 
 		# end the turn and select a new player to start the next turn
 		self.end_turn(int_center_initial)
