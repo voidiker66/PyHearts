@@ -214,7 +214,7 @@ class Game():
 
 		if self.tracker:
 			# track points for the turn
-			self.tracker.track_cards_received(list(card for player, card in self.center.items()))
+			self.tracker.track_cards_received(list(self.deck.convert_external_card_to_int(card) for player, card in self.center.items()), self.player_start_round)
 			# refresh the center and increment the turn counter
 			self.tracker.end_turn()
 

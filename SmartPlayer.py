@@ -14,10 +14,18 @@ class SmartPlayer(Player):
 		# uncomment to just use the original function (only if do not want a smart player)
 		# return super(SmartPlayer, self).take_turn(initial, first_card, hearts_broken)
 
+		# get how many cards have been played before you
+		# how many people are left to play after you is important
+		play_count = len(self.tracker.current_center)
+
+		# set the weights for each suit
+		# default: spades=10, hearts=10, diamond=10, clubs=10
+		suit_weights = self.get_weights(play_count)
+
 		# create a dict of (card : point_value) pairs based on the policy
 		points = dict()
 		for c in self.get_valid_cards(initial, first_card, hearts_broken):
-			points[c] = self.policy(c)
+			points[c] = self.policy(c, suit_weights, play_count)
 		print(points)
 
 		# get the card with the max policy value in this situation
@@ -137,14 +145,11 @@ class SmartPlayer(Player):
 
 		return weights
 
-	def policy(self, card):
+	def policy(self, card, suit_weights, play_count):
 		"""
 			assigns a point value to the card based on the
 			potential benefits of playing the card in this situation
 		"""
-		# get how many cards have been played before you
-		# how many people are left to play after you is important
-		play_count = len(self.tracker.current_center)
 
 		# suit of the card to be evaluated
 		suit = card // 13
@@ -165,10 +170,6 @@ class SmartPlayer(Player):
 
 		else:
 			# these weights will only be used in this section
-
-			# set the weights for each suit
-			# default: spades=10, hearts=10, diamond=10, clubs=10
-			suit_weights = self.get_weights(play_count)
 
 			# how many points would be gained if we won
 			points_weight = 0
