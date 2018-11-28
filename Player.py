@@ -114,7 +114,7 @@ class Player():
 					c = "2♣"
 				else:
 					c = "3♣"
-				self.debug("You must play " + c + " as the initial card for this round.")
+				# self.debug("You must play " + c + " as the initial card for this round.")
 				return False
 
 			# cannot play hearts unless hearts have been broken or you only have hearts left
@@ -132,7 +132,7 @@ class Player():
 						reason = "Hearts have not been broken."
 					else:
 						reason = "You have a card that is not a heart."
-				self.debug("You cannot play a heart. " + reason)
+				# self.debug("You cannot play a heart. " + reason)
 				return False
 			return True
 		# if not first card, must abide by the first card played
@@ -143,7 +143,7 @@ class Player():
 
 			# if card played is not the same suit and you have the same suit in you hand
 			if suit != suit_initial and suit_initial in suits_in_hand:
-				self.debug("You have to play the same suit as the initial card.")
+				# self.debug("You have to play the same suit as the initial card.")
 				return False
 			return True
 

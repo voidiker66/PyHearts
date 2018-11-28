@@ -26,14 +26,12 @@ class SmartPlayer(Player):
 		points = dict()
 		for c in self.get_valid_cards(initial, first_card, hearts_broken):
 			points[c] = self.policy(c, suit_weights, play_count)
-		print(points)
 
 		# get the card with the max policy value in this situation
 		# if multiple with the same value, chooses the first (should not matter)
 		# only problem I see is that we prioritize lower cards over higher cards
 		# meaning - 1, 2, 3, etc for each suit, and spade, hearts, diamonds, clubs for suits
 		card_index = self.hand.int_deck_array.index(max(points.keys(), key=(lambda i: points[i])))
-		print(card_index)
 
 		# this is the card we should play according to our policy
 		card = self.hand.deck_array[card_index]
@@ -99,7 +97,7 @@ class SmartPlayer(Player):
 				# if we reasonably have more spades than anyone else
 				# if (num spades left // len(num players that do not have an off suit or none of the off suits is spades)) less than spades in hand
 				if (self.tracker.suits[0] // len(list([p for p in range(self.tracker.player_count) if not p in self.tracker.off_suit.keys() \
-				or 0 not in self.tracker.off_suit[p]]))) < list([c for c in self.hand.int_deck_array if c // 13 == 0]):
+				or 0 not in self.tracker.off_suit[p]]))) < len(list([c for c in self.hand.int_deck_array if c // 13 == 0])):
 					# treat spades with more weight
 					"""
 						if we play more spades, forces out higher spades?
@@ -123,7 +121,7 @@ class SmartPlayer(Player):
 					# if we reasonably have more spades than anyone else
 					# if (num spades left // len(num players that do not have an off suit or none of the off suits is spades)) less than spades in hand
 					if (self.tracker.suits[0] // len(list([p for p in range(self.tracker.player_count) if not p in self.tracker.off_suit.keys() \
-					or 0 not in self.tracker.off_suit[p]]))) < list([c for c in self.hand.int_deck_array if c // 13 == 0]):
+					or 0 not in self.tracker.off_suit[p]]))) < len(list([c for c in self.hand.int_deck_array if c // 13 == 0])):
 						weights[0] *= 10
 					else:
 						# if playing spades puts us at risk, we should avoid
@@ -154,6 +152,12 @@ class SmartPlayer(Player):
 		# suit of the card to be evaluated
 		suit = card // 13
 
+		# how many points would be gained if we won
+		points_weight = 0
+
+		# weight card based on how high the card is (higher is better)
+		card_weight = card % 13
+
 		if play_count == 0:
 			# if this is the first turn in the round, we obviously need to play 2 of clubs
 			# so we treat 2 of clubs as 100 and all else as 1 so that we know it is the max value
@@ -168,15 +172,11 @@ class SmartPlayer(Player):
 				else:
 					return 1
 
+			# if first card this turn, but not the first card this round (not restricted to 2 of clubs)
+			else:
+				risk_score = 0
+				return suit_weights[suit] + risk_score + card_weight
 		else:
-			# these weights will only be used in this section
-
-			# how many points would be gained if we won
-			points_weight = 0
-
-			# higher the card, the better
-			card_weight = 10
-
 			# if we are the last to play, we can potentially choose to take the turn or give it up
 			if play_count == 3:
 				# counts how many hearts are in the center
@@ -195,9 +195,6 @@ class SmartPlayer(Player):
 				if wins_turn:
 					# weight card based on the inverse of points gained
 					points_weight = 1.0 / ((points + 1.0) ** 2)
-
-				# weight card based on how high the card is (higher is better)
-				card_weight = card % 13
 
 
 			"""

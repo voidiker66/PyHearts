@@ -208,6 +208,8 @@ class Game():
 			if suit == 1 and not self.hearts_broken:
 				self.debug("Hearts have been broken.")
 				self.hearts_broken = True
+				if self.tracker:
+					self.tracker.set_hearts_broken(True)
 			if suit_initial == suit and int_card >= top_card:
 				self.player_start_round = player
 				top_card = int_card

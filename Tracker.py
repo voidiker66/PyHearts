@@ -94,10 +94,17 @@ class Tracker():
 		"""
 		self.player_count = player_count
 
+	def set_hearts_broken(self, boolean):
+		self.hearts_broken = boolean
+
 	def track_cards_received(self, cards, player_id):
 		"""
 			for each card received, add the value to the player if heart or queen of spades
 		"""
+		# define player in the dict if not already defined
+		if player_id not in self.points_received.keys():
+			self.points_received[player_id] = 0
+
 		# if card is queen of spades
 		for card in cards:
 			if card == 10:

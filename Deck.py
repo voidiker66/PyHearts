@@ -122,7 +122,7 @@ class Deck():
 		if value / 13 == 4:
 			suit = '♣'
 		else:
-			suit = self.get_key_from_val(math.floor(value / 13), char_suit_dict)
+			suit = self.get_key_from_val(math.floor(value / 13), self.char_suit_dict)
 		num = value % 13
 		card = num
 		if num == 1:
