@@ -28,7 +28,7 @@ class Tracker():
 		# suits counts so we can reduce times calculated
 		# allows us to know how many of each suit are left
 		# 0=spades, 1=hearts, 2=diamonds, 3=clubs
-		self.suits = {0:13, 1:13, 2:13, 4:13}
+		self.suits = {0:13, 1:13, 2:13, 3:13}
 
 		# we need to track is someone is out of a suit so we can predict their play
 		# dict of lists, where player_id provides list of suits player no longer has

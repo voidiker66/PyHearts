@@ -15,13 +15,17 @@ class SmartPlayer(Player):
 		# return super(SmartPlayer, self).take_turn(initial, first_card, hearts_broken)
 
 		# create a dict of (card : point_value) pairs based on the policy
-		points = list(map(lambda v: self.policy(v), self.get_valid_cards(initial, first_card, hearts_broken)))
+		points = dict()
+		for c in self.get_valid_cards(initial, first_card, hearts_broken):
+			points[c] = self.policy(c)
+		print(points)
 
 		# get the card with the max policy value in this situation
 		# if multiple with the same value, chooses the first (should not matter)
 		# only problem I see is that we prioritize lower cards over higher cards
 		# meaning - 1, 2, 3, etc for each suit, and spade, hearts, diamonds, clubs for suits
-		card_index = max(points.keys(), key=(lambda i: points[i]))
+		card_index = self.hand.int_deck_array.index(max(points.keys(), key=(lambda i: points[i])))
+		print(card_index)
 
 		# this is the card we should play according to our policy
 		card = self.hand.deck_array[card_index]
@@ -82,10 +86,6 @@ class SmartPlayer(Player):
 
 		# if we are the first to play, need to choose the initial card
 		if play_count == 0:
-			# if queen of spades has not already been played
-			if 10 not in self.tracker.cards_played:
-				pass
-
 			# if player has queen of spades (determine weights of spades)
 			if 10 in self.hand.int_deck_array:
 				# if we reasonably have more spades than anyone else
@@ -97,18 +97,45 @@ class SmartPlayer(Player):
 						if we play more spades, forces out higher spades?
 						forces others to play off-suit, draining their hand?
 					"""
-					weights[0] = 100
+					weights[0] *= 10
 				# if we have only a few spades, need to conserve them and drain other suits
 				else:
-					weights[0] = 1
+					weights[0] /= 10
 
 			# do not have queen of spades in our hand
 			else:
-				pass
-			pass
+				# if queen of spades has already been played, we do not need to 
+				# rush spades to force queen of spades. instead, focus on hearts
+				if 10 in self.tracker.cards_played:
+					pass
+
+				# if queen of spades has not been played, we can choose to rush spades if 
+				# we have more spades than ace or king, or we can play normally
+				else:
+					# if we reasonably have more spades than anyone else
+					# if (num spades left // len(num players that do not have an off suit or none of the off suits is spades)) less than spades in hand
+					if (self.tracker.suits[0] // len(list([p for p in range(self.tracker.player_count) if not p in self.tracker.off_suit.keys() \
+					or 0 not in self.tracker.off_suit[p]]))) < list([c for c in self.hand.int_deck_array if c // 13 == 0]):
+						weights[0] *= 10
+					else:
+						# if playing spades puts us at risk, we should avoid
+						if 11 in self.hand.int_deck_array or 12 in self.hand.int_deck_array:
+							weights[0] /= 5
+						# if we can't force out queen ourselves, it is still a good option, but not a priority
+						else:
+							weights[0] *= 5
+
 		# we have to follow the suit, so weigh the initial suit appropriately
 		else:
 			weights[self.tracker.current_center[0] // 13] = 100
+
+		# our next objective is to get rid of an entire suit
+		# even if we are not first, we need to weigh in case we don't have the initial suit
+		for s in range(4):
+			# weight of each suit inversely related to the amount of cards left of that suit in your hand
+			weights[s] += (1.0 / ((1.0 + len(list([c for c in self.hand.int_deck_array if (c // 13) == s])))) ** 2)
+
+		return weights
 
 	def policy(self, card):
 		"""
@@ -141,7 +168,7 @@ class SmartPlayer(Player):
 
 			# set the weights for each suit
 			# default: spades=10, hearts=10, diamond=10, clubs=10
-			weights = self.get_weights(card, play_count)
+			suit_weights = self.get_weights(play_count)
 
 			# how many points would be gained if we won
 			points_weight = 0
@@ -183,7 +210,7 @@ class SmartPlayer(Player):
 			"""
 
 			# based on this policy, the card has this value at being played
-			# right now, we just use 1 because we have yet to write the policy
-			return weights[suit] + points_weight + card_weight
+			# highest card that can be played of the best suit that won't give us too many points
+			return suit_weights[suit] - points_weight + card_weight
 
 
