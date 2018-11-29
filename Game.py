@@ -6,7 +6,7 @@ class Game():
 		self.players is a list of Player objects
 	"""
 
-	def __init__(self, tracker=None, debug=False):
+	def __init__(self, tracker=None, debug=False, flask=False):
 		self.players = list()
 		self.game_over = False
 		self.deck = Deck()
@@ -14,11 +14,19 @@ class Game():
 		self.first_heart_card = None
 		self.player_start_round = None
 		self.center = dict()
+		self.center_ordered = list()
 		self.round_over = False
 		self.hearts_broken = False
 
 		self.tracker = tracker
 		self.output_debug = debug
+
+		self.flask = flask
+
+		# if this is a flask game, need to set parameters
+		if self.flask:
+			self.current_player = None
+			self.first_card = None
 
 		# the card that dictates who starts the round
 		# 39 = 2 of clubs, 40 = 3 of clubs
@@ -57,6 +65,11 @@ class Game():
 			if player.score > 100:
 				self.debug(player.name + " lost the game!")
 				self.game_over = True
+
+		# if flask, all we need to know is do we keep playing
+		if self.flask:
+			return self.game_over
+
 		if self.game_over:
 			self.debug("The winner of the game is " + winner + " with a score of " + str(best_score) + "!")
 		else:
@@ -100,6 +113,17 @@ class Game():
 		self.print_scores()
 		start_card = self.deal_cards()
 
+		# if not the website, run the command line script
+		if not self.flask:
+			self.cmd_line_play(start_card)
+
+		# if flask website, now we wait for user input
+		else:
+			self.first_card = None
+			self.initial_card = None
+			return True
+
+	def cmd_line_play(self, start_card=None):
 		# while the players still have cards to play
 		while not self.round_over:
 			# this will reset the start_card after the first round
@@ -112,14 +136,29 @@ class Game():
 				self.round_over = True
 		self.score_round()
 
+	# used for flask
+	def set_first_card(self, card):
+		self.first_card = card
+
+	# used for flask
+	def set_initial_card(self, card):
+		self.initial_card = card
+
+	# used for flask
+	def set_current_player(self, player_id):
+		self.current_player = player_id
+
 	def print_center(self):
 		"""
 			prints the center to allow players to see what cards have been played so far this turn
 		"""
 		self.debug('Cards played in this order: ')
-		for key, value in self.center.items():
-			self.debug(value, end=' ')
+		for card in self.center_ordered:
+			self.debug(card, end=' ')
 		self.debug('\n')
+
+	def player_turn(self, player, initial_card, first_card, hearts_broken):
+		return player.take_turn(initial_card, first_card, hearts_broken)
 
 	def players_take_turn(self, first_card=None):
 		"""
@@ -130,11 +169,13 @@ class Game():
 		"""
 		# clear the center
 		self.center = dict()
+		self.center_ordered = list()
 
 		# the initial card determines validity
 		# initial card is set by the first Player
-		center_initial = self.players[self.player_start_round].take_turn(None, first_card, self.hearts_broken)
+		center_initial = self.player_turn(self.players[self.player_start_round], None, first_card, self.hearts_broken)
 		self.center[self.player_start_round] = center_initial
+		self.center_ordered.append(self.center[self.player_start_round])
 		if self.tracker:
 			self.tracker.card_played(self.deck.convert_external_card_to_int(center_initial), self.player_start_round)
 
@@ -143,14 +184,18 @@ class Game():
 
 		for i in range(self.player_start_round + 1, len(self.players)):
 			self.print_center()
-			self.center[i] = self.players[i].take_turn(int_center_initial, None, self.hearts_broken)
+			self.center[i] = self.player_turn(self.players[i], int_center_initial, None, self.hearts_broken)
+			self.center_ordered.append(self.center[i])
 			if self.tracker:
 				self.tracker.card_played(self.deck.convert_external_card_to_int(self.center[i]), i)
 		for i in range(self.player_start_round):
 			self.print_center()
-			self.center[i] = self.players[i].take_turn(int_center_initial, None, self.hearts_broken)
+			self.center[i] = self.player_turn(self.players[i], int_center_initial, None, self.hearts_broken)
+			self.center_ordered.append(self.center[i])
 			if self.tracker:
 				self.tracker.card_played(self.deck.convert_external_card_to_int(self.center[i]), i)
+
+		self.print_center()
 
 		# end the turn and select a new player to start the next turn
 		self.end_turn(int_center_initial)

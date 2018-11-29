@@ -30,7 +30,7 @@ class Player():
 		self.valid = False
 
 		# temporary to automate gameplay
-		card_index = -1
+		# card_index = -1
 		# r = len(self.hand.deck_array) - 1
 
 		while not self.valid:
@@ -41,21 +41,21 @@ class Player():
 			# get index of the card in the Player's hand
 			# user input must be an int associated with the index of the hand
 
-			# try:
-			# 	card_index = int(input("Which card will you play?\n"))
-			# 	if card_index == '':
-			# 		self.debug("Please type the number next to the card you want to play and press enter.\n")
-			# 		continue
-			# 	if card_index < 0 or card_index >= len(self.hand.deck_array):
-			# 		self.debug("This is not a valid choice.")
-			# 		continue
-			# except ValueError:
-			# 	self.debug("The user input was not a number.")
-			# 	continue
+			try:
+				card_index = int(input("Which card will you play?\n"))
+				if card_index == '':
+					self.debug("Please type the number next to the card you want to play and press enter.\n")
+					continue
+				if card_index < 0 or card_index >= len(self.hand.deck_array):
+					self.debug("This is not a valid choice.")
+					continue
+			except ValueError:
+				self.debug("The user input was not a number.")
+				continue
 
 			# temporary to automate gameplay
 			# card_index = random.randint(0, r)
-			card_index += 1
+			# card_index += 1
 
 			if self.check_play_validity(self.hand.int_deck_array[card_index], initial, first_card, hearts_broken):
 				self.valid = True
